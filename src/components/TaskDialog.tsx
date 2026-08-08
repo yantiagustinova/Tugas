@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import TaskHistory from "./TaskHistory";
 import { formatDateId } from "@/lib/dates";
 import { STATUS_OPTIONS, type Status, type Task } from "@/lib/types";
 import { cx } from "@/lib/ui";
@@ -236,6 +237,10 @@ export default function TaskDialog({
             </div>
           </div>
         )}
+
+        <div className="mt-5">
+          <TaskHistory taskId={task.id} />
+        </div>
       </div>
     </div>
   );

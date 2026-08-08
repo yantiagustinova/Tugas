@@ -69,8 +69,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # db/schema.sql tidak ikut terperiksa oleh typecheck, jadi dijalankan
-      # betulan ke PostgreSQL untuk menangkap error SQL sedini mungkin.
+      # SQL di db/schema.mjs tidak ikut terperiksa oleh typecheck, jadi
+      # dijalankan betulan ke PostgreSQL untuk menangkap error sedini mungkin.
       - name: Terapkan skema
         run: npm run db:setup
 

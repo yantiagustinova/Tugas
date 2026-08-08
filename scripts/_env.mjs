@@ -40,13 +40,18 @@ export function connect() {
     process.exit(1);
   }
 
-  const isLocal = /@(localhost|127\.0\.0\.1)/.test(url);
-  const hasSslParam = /[?&]sslmode=/.test(url);
+  // postgres.js tidak membaca `sslmode=` dari URL; TLS harus ditentukan
+  // lewat opsi. Sama persis dengan aturan di src/lib/db.ts.
+  const ssl = /[?&]sslmode=disable(&|$)/.test(url)
+    ? false
+    : /@(localhost|127\.0\.0\.1|\[::1\])[:/]/.test(url)
+      ? false
+      : "require";
 
   return postgres(url, {
     max: 1,
     prepare: false,
-    ssl: !isLocal && !hasSslParam ? "require" : undefined,
+    ssl,
     // "IF NOT EXISTS" wajar memicu NOTICE saat script dijalankan ulang —
     // tidak perlu memenuhi log CI.
     onnotice: () => {},

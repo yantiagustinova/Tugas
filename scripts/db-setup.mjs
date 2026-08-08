@@ -1,13 +1,11 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { SCHEMA_SQL } from "../db/schema.mjs";
 import { connect, loadEnv } from "./_env.mjs";
 
 loadEnv();
 const sql = connect();
 
 try {
-  const schema = readFileSync(resolve(process.cwd(), "db/schema.sql"), "utf8");
-  await sql.unsafe(schema);
+  await sql.unsafe(SCHEMA_SQL);
   console.log(
     "✔ Skema database siap (tabel users, tasks, task_history, reminder_log).",
   );

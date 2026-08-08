@@ -26,6 +26,20 @@ export type Task = {
   updatedAt: string;
 };
 
+/** Satu titik di timeline riwayat perubahan sebuah tugas. */
+export type TaskHistoryEntry = {
+  id: number;
+  kind: "dibuat" | "update";
+  byName: string;
+  progressFrom: number | null;
+  progressTo: number | null;
+  statusFrom: Status | null;
+  statusTo: Status | null;
+  dueDateFrom: string | null;
+  dueDateTo: string | null;
+  createdAt: string;
+};
+
 /** Status turunan yang dipakai untuk filter & warna di dashboard. */
 export type DerivedState = "selesai" | "terlambat" | "segera" | "on-track";
 

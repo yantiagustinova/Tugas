@@ -30,11 +30,36 @@ minggu.
 | --- | --- | --- |
 | §2 Login pilih nama + PIN | ✅ | Dropdown nama + PIN 4–8 angka, sesi cookie 30 hari. Tanpa registrasi mandiri. |
 | §3 Model data tugas | ✅ | Nama tugas, pemilik (otomatis dari user login), target, due date, progress 0–100%, status terakhir, timestamp update. |
-| §4.1 Input & update tugas | ✅ | Form tambah tugas; update kilat 1 tap lewat chip progress (0/25/50/75/100) dan chip status di kartu. |
+| §4.1 Input & update tugas | ✅ | Form tambah tugas; update kilat 1 tap lewat chip progress (0/25/50/75/100) dan chip status di kartu. Riwayat perubahan (Fase 2) sudah ada — lihat di bawah. |
 | §4.2 Dashboard monitoring | ✅ | Semua tugas tim dalam satu layar, filter per orang / per status / urut due date terdekat, kartu merah untuk yang lewat due date. |
 | §4.3 Reminder WA otomatis | ✅ | Cron harian: pesan personal mulai H-2 sampai tugas selesai + rekap harian ke grup. Satu arah (app → WA). |
 | §4.4 Semua user setara | ✅ | Tidak ada role admin. Semua orang lihat semua tugas, hanya bisa update tugas sendiri (dipaksa di level API). |
 | §4.5 Status = dropdown | ✅ | Hanya "Proses" / "Terkendala" / "Selesai" (di-*constraint* juga di database). |
+
+### Fase 2 — riwayat perubahan
+
+Sesuai §4.1 yang menaruh riwayat di Fase 2, setiap penyimpanan yang benar-benar
+mengubah **progress**, **status**, atau **due date** kini tercatat di tabel
+`task_history` dan tampil sebagai timeline di dialog detail tugas — bisa dibaca
+seluruh anggota tim, sama seperti dashboard.
+
+Yang perlu diketahui soal perilakunya:
+
+- Menyimpan nilai yang sama persis **tidak** menghasilkan baris riwayat, jadi
+  timeline tidak penuh entri kosong saat staf menekan chip yang sudah aktif.
+- Satu penyimpanan yang mengubah dua field sekaligus (mis. geser ke 100% yang
+  otomatis mengubah status jadi "Selesai") menjadi **satu** entri berisi dua
+  baris, bukan dua entri terpisah.
+- Pembuatan tugas ikut tercatat sebagai titik awal timeline ("Tugas dibuat").
+- Perubahan **nama tugas** dan **target** sengaja tidak dicatat — spek meminta
+  riwayat perubahan status, bukan audit trail penuh.
+- Menghapus tugas ikut menghapus riwayatnya (`ON DELETE CASCADE`).
+
+> **Kalau aplikasi sudah pernah dideploy**, jalankan `npm run db:setup` sekali
+> lagi terhadap database produksi untuk membuat tabel `task_history`. Skema
+> memakai `CREATE TABLE IF NOT EXISTS`, jadi data lama tidak tersentuh. Tugas
+> yang dibuat sebelum upgrade tidak punya entri "Tugas dibuat" — timeline-nya
+> mulai dari perubahan pertama setelah upgrade.
 
 Tambahan kecil di luar spek yang membantu pengujian minggu ini:
 
@@ -92,7 +117,7 @@ openssl rand -base64 32
 ### 3. Siapkan tabel dan daftar nama tim
 
 ```bash
-npm run db:setup                    # bikin tabel users, tasks, reminder_log
+npm run db:setup                    # bikin tabel users, tasks, task_history, reminder_log
 cp seed/team.example.json seed/team.json
 # edit seed/team.json: nama, nomor WA, PIN awal tiap orang
 npm run db:seed
@@ -254,7 +279,7 @@ Update progress di: https://task-tracker-envilog.vercel.app
 
 ```
 .github/workflows/ci.yml   CI: typecheck, build, dan uji skema SQL
-db/schema.sql              Skema PostgreSQL (users, tasks, reminder_log)
+db/schema.sql              Skema PostgreSQL (users, tasks, task_history, reminder_log)
 scripts/                   CLI: setup skema, seed anggota tim, reset PIN
 seed/team.example.json     Contoh daftar anggota tim
 vercel.json                Jadwal cron harian
@@ -265,9 +290,10 @@ src/app/
   pengingat/page.tsx       Pratinjau pesan WA (dry run, tidak mengirim)
   api/auth/…               Login & logout
   api/tasks/…              CRUD tugas + aturan "hanya pemilik yang boleh ubah"
+  api/tasks/[id]/history/  Riwayat perubahan satu tugas (baca untuk semua)
   api/cron/reminder/       Endpoint yang dipanggil Vercel Cron
 
-src/components/            Dashboard, kartu tugas, dialog tambah/ubah
+src/components/            Dashboard, kartu tugas, dialog tambah/ubah, timeline riwayat
 src/lib/
   db.ts                    Koneksi PostgreSQL (lazy, aman untuk serverless)
   session.ts               Sesi JWT di cookie HttpOnly
@@ -302,8 +328,6 @@ npm run build
 
 Hal-hal yang **sengaja** belum dikerjakan, sesuai keputusan di spek:
 
-- **Riwayat perubahan status** (§4.1) — belum ada, masuk Fase 2. Yang tersimpan
-  baru kondisi terakhir dan timestamp update terakhir.
 - **Halaman admin** — pengelolaan anggota lewat CLI, karena §4.4 memutuskan
   semua user setara dan daftar nama diisi manual di awal.
 - **Update lewat WA** — tidak ada. Pengiriman satu arah saja (app → WA), sesuai
@@ -322,5 +346,5 @@ Batasan teknis yang perlu diketahui:
 - Semua perhitungan tanggal memakai zona `Asia/Jakarta` (bisa diubah lewat
   `APP_TIMEZONE`), bukan zona server.
 
-Kandidat Fase 2 kalau uji coba minggu ini lancar: riwayat perubahan, komentar
-per tugas, tugas berulang, ekspor rekap mingguan, dan halaman admin.
+Kandidat lanjutan kalau uji coba minggu ini lancar: komentar per tugas, tugas
+berulang, ekspor rekap mingguan, dan halaman admin.

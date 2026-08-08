@@ -8,7 +8,9 @@ const sql = connect();
 try {
   const schema = readFileSync(resolve(process.cwd(), "db/schema.sql"), "utf8");
   await sql.unsafe(schema);
-  console.log("✔ Skema database siap (tabel users, tasks, reminder_log).");
+  console.log(
+    "✔ Skema database siap (tabel users, tasks, task_history, reminder_log).",
+  );
 } catch (err) {
   console.error("✖ Gagal menyiapkan skema:", err.message);
   process.exitCode = 1;

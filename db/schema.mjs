@@ -1,6 +1,15 @@
--- Envilog Task Tracker — skema database (PostgreSQL)
--- Dijalankan lewat: npm run db:setup
-
+/**
+ * Skema database Envilog Task Tracker (PostgreSQL) — sumber tunggal.
+ *
+ * Disimpan sebagai modul JavaScript, bukan berkas .sql, supaya bisa dipakai
+ * dua-duanya tanpa risiko isinya berbeda:
+ *   - script CLI  : npm run db:setup
+ *   - halaman web : POST /api/setup/schema (untuk yang tidak punya terminal)
+ *
+ * Seluruhnya memakai IF NOT EXISTS, jadi aman dijalankan berulang kali dan
+ * tidak menyentuh data yang sudah ada.
+ */
+export const SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS users (
   id          SERIAL PRIMARY KEY,
   name        TEXT        NOT NULL UNIQUE,
@@ -66,3 +75,4 @@ CREATE UNIQUE INDEX IF NOT EXISTS reminder_log_personal_uniq
 CREATE UNIQUE INDEX IF NOT EXISTS reminder_log_recap_uniq
   ON reminder_log (run_date)
   WHERE kind = 'recap';
+`;

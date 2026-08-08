@@ -16,6 +16,7 @@ minggu.
 - [Teknologi](#teknologi)
 - [Menjalankan di lokal](#menjalankan-di-lokal)
 - [Deploy ke Vercel](#deploy-ke-vercel)
+- [Setup tanpa terminal (lewat browser)](#setup-tanpa-terminal-lewat-browser)
 - [Setup gateway WhatsApp](#setup-gateway-whatsapp)
 - [Mengelola anggota tim & PIN](#mengelola-anggota-tim--pin)
 - [Cara kerja pengingat](#cara-kerja-pengingat)
@@ -152,6 +153,7 @@ Buka http://localhost:3000, login dengan nama + PIN dari `seed/team.json`.
    | `FONNTE_TOKEN` / `WABLAS_TOKEN` | | sesuai gateway yang dipakai |
    | `APP_TIMEZONE` | | default `Asia/Jakarta` |
    | `REMINDER_LEAD_DAYS` | | default `2` (H-2) |
+   | `SETUP_SECRET` | | aktifkan sementara kalau ingin setup lewat browser — lihat bagian di bawah |
 
 3. Deploy. Cron sudah terdaftar lewat `vercel.json`:
 
@@ -162,12 +164,17 @@ Buka http://localhost:3000, login dengan nama + PIN dari `seed/team.json`.
    Vercel Cron memakai UTC, jadi `0 1 * * *` = **08:00 WIB** setiap hari.
    Ubah angka jamnya kalau mau jam lain (mis. `0 0 * * *` = 07:00 WIB).
 
-4. Jalankan sekali dari laptop untuk menyiapkan database produksi:
+4. Siapkan database produksi — pilih salah satu:
+
+   **Dari laptop:**
 
    ```bash
    DATABASE_URL="<url-produksi>" npm run db:setup
    DATABASE_URL="<url-produksi>" npm run db:seed
    ```
+
+   **Tanpa terminal:** pakai halaman `/setup` — lihat
+   [Setup tanpa terminal](#setup-tanpa-terminal-lewat-browser).
 
 > **Catatan:** Vercel Hobby membatasi cron **1× per hari**. Skema saat ini
 > memang butuh sekali sehari, jadi Hobby cukup.
@@ -197,6 +204,34 @@ DATABASE_URL="<connection string dari tab Storage>" npm run db:seed
 > string, jadi aplikasi menentukan sendiri: TLS diwajibkan untuk semua host
 > selain `localhost`/`127.0.0.1`. Ini yang membuat koneksi ke Vercel Postgres,
 > Neon, dan Supabase berhasil tanpa konfigurasi tambahan.
+
+---
+
+## Setup tanpa terminal (lewat browser)
+
+Kalau tidak bisa menjalankan `npm run db:setup` / `db:seed` dari laptop,
+halaman **`/setup`** melakukan hal yang sama lewat browser.
+
+1. Di Vercel, tambahkan env `SETUP_SECRET` berisi string acak yang panjang,
+   lalu **Redeploy**.
+2. Buka `https://<domain-anda>/setup` dan masukkan nilai `SETUP_SECRET` tadi.
+3. Tekan **Buat / perbarui tabel** — ini membuat semua tabel yang belum ada.
+4. Daftarkan anggota tim satu per satu: nama, nomor WA, dan PIN awal.
+5. **Hapus env `SETUP_SECRET` lalu redeploy.** Halaman `/setup` dan seluruh
+   endpoint-nya langsung mati.
+
+Pengamannya:
+
+- Tanpa `SETUP_SECRET`, `/api/setup/*` menjawab `404` — bukan sekadar menolak,
+  tapi berperilaku seolah tidak ada.
+- Kunci dibandingkan secara *timing-safe*, dengan batas 10 percobaan gagal per
+  10 menit.
+- PIN tidak pernah dikirim balik ke browser; yang tersimpan hanya hash bcrypt.
+- Mengubah nomor WA seseorang tanpa mengisi kolom PIN **tidak** mengganti PIN
+  orang tersebut.
+
+Halaman ini sengaja tidak memerlukan login — sebelum ada anggota terdaftar,
+belum ada seorang pun yang bisa masuk.
 
 ---
 
@@ -240,8 +275,9 @@ yang sama dalam tampilan rapi.
 
 ## Mengelola anggota tim & PIN
 
-Belum ada halaman admin (sesuai §4.4: semua user setara). Pengelolaan anggota
-dilakukan lewat CLI dari laptop:
+Ada dua cara: lewat halaman `/setup` di browser (lihat bagian
+[Setup tanpa terminal](#setup-tanpa-terminal-lewat-browser)), atau lewat CLI
+dari laptop:
 
 ```bash
 # tambah anggota baru / update nomor WA — PIN yang sudah ada TIDAK diubah
@@ -305,7 +341,7 @@ Update progress di: https://task-tracker-envilog.vercel.app
 
 ```
 .github/workflows/ci.yml   CI: typecheck, build, dan uji skema SQL
-db/schema.sql              Skema PostgreSQL (users, tasks, task_history, reminder_log)
+db/schema.mjs              Skema PostgreSQL — sumber tunggal untuk CLI & /setup
 scripts/                   CLI: setup skema, seed anggota tim, reset PIN
 seed/team.example.json     Contoh daftar anggota tim
 vercel.json                Jadwal cron harian
@@ -314,9 +350,11 @@ src/app/
   page.tsx                 Dashboard (server component)
   login/page.tsx           Halaman login
   pengingat/page.tsx       Pratinjau pesan WA (dry run, tidak mengirim)
+  setup/page.tsx           Buat tabel + daftarkan anggota tanpa terminal
   api/auth/…               Login & logout
   api/tasks/…              CRUD tugas + aturan "hanya pemilik yang boleh ubah"
   api/tasks/[id]/history/  Riwayat perubahan satu tugas (baca untuk semua)
+  api/setup/…              Setup lewat browser (mati kalau SETUP_SECRET kosong)
   api/cron/reminder/       Endpoint yang dipanggil Vercel Cron
 
 src/components/            Dashboard, kartu tugas, dialog tambah/ubah, timeline riwayat
@@ -339,7 +377,7 @@ job paralel:
 | Job | Isi | Kenapa |
 | --- | --- | --- |
 | **Typecheck & build** | `npm run typecheck` lalu `npm run build` | Sengaja dijalankan **tanpa** `DATABASE_URL`/`SESSION_SECRET` — koneksi database dibuat saat query pertama, jadi build wajib lolos tanpa env rahasia. Ini juga yang memastikan deploy Vercel tidak gagal. |
-| **Skema & seed database** | `npm run db:setup` dan `npm run db:seed`, masing-masing 2×, terhadap service PostgreSQL 16 | `db/schema.sql` tidak tersentuh TypeScript, jadi SQL-nya dijalankan betulan. Dijalankan dua kali untuk membuktikan skema dan seed tetap aman kalau diulang. |
+| **Skema & seed database** | `npm run db:setup` dan `npm run db:seed`, masing-masing 2×, terhadap service PostgreSQL 16 | SQL di `db/schema.mjs` tidak tersentuh TypeScript, jadi dijalankan betulan. Dijalankan dua kali untuk membuktikan skema dan seed tetap aman kalau diulang. |
 
 Jalankan pemeriksaan yang sama di lokal:
 

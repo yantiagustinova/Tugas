@@ -1,13 +1,16 @@
 name: CI
 
+# Push hanya dipantau di main; branch lain sudah tercakup lewat pull_request.
+# Kalau keduanya dipasang untuk semua branch, satu commit di branch ber-PR
+# memicu dua run sekaligus.
 on:
   push:
-    branches: ["**"]
+    branches: [main]
   pull_request:
 
 # Kalau ada push baru ke branch yang sama, batalkan run yang masih jalan.
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:

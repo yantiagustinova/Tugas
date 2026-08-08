@@ -2,6 +2,19 @@ import postgres from "postgres";
 
 type Sql = postgres.Sql<Record<string, never>>;
 
+/**
+ * postgres.js TIDAK membaca `sslmode=` dari connection string — kalau opsi
+ * `ssl` dibiarkan kosong, koneksi dibuka tanpa TLS walaupun URL-nya menulis
+ * `?sslmode=require`. Penyedia terkelola (Vercel Postgres, Neon, Supabase)
+ * menolak koneksi non-TLS, jadi TLS ditentukan di sini, bukan diserahkan
+ * ke URL.
+ */
+export function sslSetting(url: string): "require" | false {
+  if (/[?&]sslmode=disable(&|$)/.test(url)) return false;
+  if (/@(localhost|127\.0\.0\.1|\[::1\])[:/]/.test(url)) return false;
+  return "require";
+}
+
 function createClient(): Sql {
   const connectionString =
     process.env.DATABASE_URL ??
@@ -14,16 +27,13 @@ function createClient(): Sql {
     );
   }
 
-  const isLocal = /@(localhost|127\.0\.0\.1)/.test(connectionString);
-  const hasSslParam = /[?&]sslmode=/.test(connectionString);
-
   return postgres(connectionString, {
     // Serverless: satu koneksi per invocation, dan matikan prepared statement
     // supaya aman lewat connection pooler (PgBouncer / Supabase pooler).
     max: 1,
     idle_timeout: 20,
     prepare: false,
-    ssl: !isLocal && !hasSslParam ? "require" : undefined,
+    ssl: sslSetting(connectionString),
   });
 }
 

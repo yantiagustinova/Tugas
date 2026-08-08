@@ -143,7 +143,7 @@ Buka http://localhost:3000, login dengan nama + PIN dari `seed/team.json`.
 
    | Variable | Wajib | Contoh |
    | --- | --- | --- |
-   | `DATABASE_URL` | ✅ | `postgresql://…?sslmode=require` |
+   | `DATABASE_URL` | ✅ | `postgresql://…?sslmode=require` — **tidak perlu diisi manual kalau memakai Vercel Postgres**, lihat catatan di bawah |
    | `SESSION_SECRET` | ✅ | hasil `openssl rand -base64 32` |
    | `CRON_SECRET` | ✅ | string acak; Vercel otomatis mengirimnya ke endpoint cron |
    | `APP_URL` | ✅ | `https://task-tracker-envilog.vercel.app` (dipakai sebagai link di pesan WA) |
@@ -171,6 +171,32 @@ Buka http://localhost:3000, login dengan nama + PIN dari `seed/team.json`.
 
 > **Catatan:** Vercel Hobby membatasi cron **1× per hari**. Skema saat ini
 > memang butuh sekali sehari, jadi Hobby cukup.
+
+### Kalau memakai Vercel Postgres
+
+Buat database lewat tab **Storage** di project Vercel. Integrasinya menyuntikkan
+env var sendiri ke project — biasanya `DATABASE_URL` dan/atau `POSTGRES_URL`.
+Aplikasi membaca ketiga nama yang umum dipakai secara berurutan:
+
+```
+DATABASE_URL  →  POSTGRES_URL  →  POSTGRES_URL_NON_POOLING
+```
+
+jadi tidak perlu menyalin connection string secara manual. Yang tetap harus
+diisi sendiri hanya `SESSION_SECRET`, `CRON_SECRET`, dan `APP_URL`.
+
+Untuk menyiapkan tabel dan anggota tim, salin connection string dari tab
+Storage lalu jalankan dari laptop:
+
+```bash
+DATABASE_URL="<connection string dari tab Storage>" npm run db:setup
+DATABASE_URL="<connection string dari tab Storage>" npm run db:seed
+```
+
+> **TLS.** Driver `postgres` **tidak** membaca `sslmode=` dari connection
+> string, jadi aplikasi menentukan sendiri: TLS diwajibkan untuk semua host
+> selain `localhost`/`127.0.0.1`. Ini yang membuat koneksi ke Vercel Postgres,
+> Neon, dan Supabase berhasil tanpa konfigurasi tambahan.
 
 ---
 

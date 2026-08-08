@@ -1,0 +1,16 @@
+node_modules
+.next
+out
+build
+.env
+.env.local
+.env*.local
+.vercel
+*.tsbuildinfo
+next-env.d.ts
+seed/team.json
+.DS_Store
+
+# Dihasilkan otomatis oleh `next dev`
+AGENTS.md
+CLAUDE.md

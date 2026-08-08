@@ -1,0 +1,86 @@
+name: CI
+
+# Push hanya dipantau di main; branch lain sudah tercakup lewat pull_request.
+# Kalau keduanya dipasang untuk semua branch, satu commit di branch ber-PR
+# memicu dua run sekaligus.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Kalau ada push baru ke branch yang sama, batalkan run yang masih jalan.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Typecheck & build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      # Sengaja tanpa DATABASE_URL / SESSION_SECRET: koneksi database dibuat
+      # saat query pertama, jadi build harus tetap lolos tanpa env rahasia.
+      - name: Build
+        run: npm run build
+
+  schema:
+    name: Skema & seed database
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: envilog_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/envilog_ci
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # db/schema.sql tidak ikut terperiksa oleh typecheck, jadi dijalankan
+      # betulan ke PostgreSQL untuk menangkap error SQL sedini mungkin.
+      - name: Terapkan skema
+        run: npm run db:setup
+
+      - name: Skema idempoten (jalankan dua kali)
+        run: npm run db:setup
+
+      - name: Seed anggota tim contoh
+        run: |
+          cp seed/team.example.json seed/team.json
+          npm run db:seed
+
+      - name: Seed idempoten (jalankan dua kali)
+        run: npm run db:seed

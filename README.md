@@ -253,6 +253,7 @@ Update progress di: https://task-tracker-envilog.vercel.app
 ## Struktur kode
 
 ```
+.github/workflows/ci.yml   CI: typecheck, build, dan uji skema SQL
 db/schema.sql              Skema PostgreSQL (users, tasks, reminder_log)
 scripts/                   CLI: setup skema, seed anggota tim, reset PIN
 seed/team.example.json     Contoh daftar anggota tim
@@ -274,6 +275,25 @@ src/lib/
   reminder.ts              Logika pengingat + penyusunan pesan WA
   wa.ts                    Adapter gateway (Fonnte / Wablas / log)
   dates.ts                 Perhitungan tanggal zona Asia/Jakarta
+```
+
+---
+
+## CI
+
+Setiap push dan pull request menjalankan `.github/workflows/ci.yml` dengan dua
+job paralel:
+
+| Job | Isi | Kenapa |
+| --- | --- | --- |
+| **Typecheck & build** | `npm run typecheck` lalu `npm run build` | Sengaja dijalankan **tanpa** `DATABASE_URL`/`SESSION_SECRET` — koneksi database dibuat saat query pertama, jadi build wajib lolos tanpa env rahasia. Ini juga yang memastikan deploy Vercel tidak gagal. |
+| **Skema & seed database** | `npm run db:setup` dan `npm run db:seed`, masing-masing 2×, terhadap service PostgreSQL 16 | `db/schema.sql` tidak tersentuh TypeScript, jadi SQL-nya dijalankan betulan. Dijalankan dua kali untuk membuktikan skema dan seed tetap aman kalau diulang. |
+
+Jalankan pemeriksaan yang sama di lokal:
+
+```bash
+npm run typecheck
+npm run build
 ```
 
 ---

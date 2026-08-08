@@ -47,5 +47,8 @@ export function connect() {
     max: 1,
     prepare: false,
     ssl: !isLocal && !hasSslParam ? "require" : undefined,
+    // "IF NOT EXISTS" wajar memicu NOTICE saat script dijalankan ulang —
+    // tidak perlu memenuhi log CI.
+    onnotice: () => {},
   });
 }

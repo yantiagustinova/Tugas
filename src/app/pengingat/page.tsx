@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AppShell, { AppHeader, HEADER_BTN } from "@/components/AppShell";
 import { formatDateId } from "@/lib/dates";
 import { runReminders } from "@/lib/reminder";
 import { requireUser } from "@/lib/session";
@@ -17,23 +18,21 @@ export default async function ReminderPreviewPage() {
   const gid = groupId();
 
   return (
-    <div className="min-h-dvh pb-16">
-      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/85 backdrop-blur">
-        <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
-          <Link
-            href="/"
-            className="rounded-xl px-3 py-2 text-sm font-medium text-slate-500 ring-1 ring-slate-200 hover:bg-slate-50"
-          >
-            ← Dashboard
-          </Link>
-          <h1 className="text-base font-bold text-slate-900">
-            Pratinjau pengingat
-          </h1>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-3xl space-y-5 px-4 py-5">
-        <div className="rounded-2xl bg-white p-4 text-sm ring-1 ring-slate-200">
+    <AppShell
+      header={
+        <AppHeader
+          title="Pratinjau pengingat"
+          subtitle="Isi pesan WhatsApp hari ini — tidak dikirim"
+          actions={
+            <Link href="/" className={HEADER_BTN}>
+              ← Dashboard
+            </Link>
+          }
+        />
+      }
+    >
+      <div className="space-y-5">
+        <div className="rounded-card bg-white p-4 text-sm ring-1 ring-slate-950/5">
           <p className="text-slate-600">
             Isi pesan yang akan dikirim cron harian untuk tanggal{" "}
             <strong className="text-slate-900">{formatDateId(report.date)}</strong>.
@@ -51,7 +50,7 @@ export default async function ReminderPreviewPage() {
             Pengingat personal ({report.personal.length})
           </h2>
           {report.personal.length === 0 ? (
-            <p className="rounded-2xl bg-white p-4 text-sm text-slate-500 ring-1 ring-slate-200">
+            <p className="rounded-card bg-white p-4 text-sm text-slate-500 ring-1 ring-slate-950/5">
               Tidak ada tugas yang jatuh tempo ≤ {report.leadDays} hari atau terlambat.
             </p>
           ) : (
@@ -59,7 +58,7 @@ export default async function ReminderPreviewPage() {
               {report.personal.map((entry) => (
                 <div
                   key={entry.ownerName}
-                  className="overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200"
+                  className="overflow-hidden rounded-card bg-white ring-1 ring-slate-950/5"
                 >
                   <div className="flex items-center justify-between gap-2 border-b border-slate-100 px-4 py-2.5">
                     <span className="text-sm font-semibold text-slate-800">
@@ -82,14 +81,14 @@ export default async function ReminderPreviewPage() {
           <h2 className="mb-2 text-sm font-semibold text-slate-700">
             Rekap harian ke grup
           </h2>
-          <div className="overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200">
+          <div className="overflow-hidden rounded-card bg-white ring-1 ring-slate-950/5">
             <pre className="overflow-x-auto px-4 py-3 text-xs leading-relaxed whitespace-pre-wrap text-slate-700">
               {report.recap.message}
             </pre>
           </div>
         </section>
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }
 

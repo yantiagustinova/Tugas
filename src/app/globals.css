@@ -1,28 +1,77 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans:
+    var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* Radius dibuat satu tangga supaya bentuk kartu, tombol, dan input konsisten. */
+  --radius-card: 0.875rem;
+  --radius-control: 0.625rem;
+}
+
 :root {
   color-scheme: light;
+
+  /* Warna semantik — dipakai lewat utilitas Tailwind di komponen. */
+  --app-bg: #f6f7f9;
+  --app-line: #e6e8ec;
 }
 
 html {
   -webkit-text-size-adjust: 100%;
+  scrollbar-gutter: stable;
 }
 
 body {
-  background-color: #f6f8fa;
+  background-color: var(--app-bg);
   color: #0f172a;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   -webkit-font-smoothing: antialiased;
-  font-family:
-    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
+  text-rendering: optimizeLegibility;
 }
 
-/* Target sentuh minimal 40px supaya enak dipakai sambil berdiri di konter. */
 button,
 select,
 input,
 textarea {
   font: inherit;
+}
+
+/* Hilangkan highlight biru bawaan saat menekan tombol di Android/iOS. */
+button,
+a,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* iOS memperbesar halaman kalau font input < 16px. */
+@supports (-webkit-touch-callout: none) {
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1em);
+  }
+}
+
+/* Area aman iPhone (notch & home indicator). */
+.pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* Baris filter yang bisa digeser — sembunyikan scrollbar-nya. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 /* Slider progress dibuat gemuk supaya gampang digeser dengan jempol. */
@@ -33,7 +82,7 @@ input[type="range"] {
 }
 
 input[type="range"]::-webkit-slider-runnable-track {
-  height: 8px;
+  height: 6px;
   border-radius: 9999px;
   background: #e2e8f0;
 }
@@ -41,18 +90,18 @@ input[type="range"]::-webkit-slider-runnable-track {
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  margin-top: -8px;
+  margin-top: -9px;
   height: 24px;
   width: 24px;
   border-radius: 9999px;
-  background: #0d9488;
-  border: 3px solid #ffffff;
-  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.35);
+  background: #ffffff;
+  border: 2px solid #2563eb;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.25);
   cursor: pointer;
 }
 
 input[type="range"]::-moz-range-track {
-  height: 8px;
+  height: 6px;
   border-radius: 9999px;
   background: #e2e8f0;
 }
@@ -60,9 +109,30 @@ input[type="range"]::-moz-range-track {
 input[type="range"]::-moz-range-thumb {
   height: 24px;
   width: 24px;
-  border: 3px solid #ffffff;
+  border: 2px solid #2563eb;
   border-radius: 9999px;
-  background: #0d9488;
-  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.35);
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.25);
   cursor: pointer;
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-sheet {
+  animation: sheet-in 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-sheet {
+    animation: none;
+  }
 }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { TeamMember } from "@/lib/types";
+import { BTN_PRIMARY, INPUT, cx } from "@/lib/ui";
 
 const LAST_USER_KEY = "envilog:last-user";
 
@@ -62,44 +63,54 @@ export default function LoginForm({ team }: { team: TeamMember[] }) {
 
   if (team.length === 0) {
     return (
-      <div className="rounded-2xl bg-amber-50 p-4 text-sm text-amber-800 ring-1 ring-amber-200">
-        Daftar nama tim masih kosong. Jalankan <code>npm run db:seed</code> untuk
-        mengisi anggota tim terlebih dahulu.
+      <div className="rounded-control bg-amber-50 p-4 text-sm text-amber-800">
+        Daftar nama tim masih kosong. Buka halaman <code>/setup</code> untuk
+        mendaftarkan anggota tim terlebih dahulu.
       </div>
     );
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label
-          htmlFor="user"
-          className="mb-1.5 block text-sm font-medium text-slate-700"
-        >
+      <label className="block">
+        <span className="mb-1.5 block text-sm font-medium text-slate-700">
           Nama
-        </label>
-        <select
-          id="user"
-          value={userId}
-          onChange={(event) => setUserId(event.target.value)}
-          className="w-full rounded-xl border-0 bg-white px-4 py-3 text-base text-slate-900 ring-1 ring-slate-300 outline-none focus:ring-2 focus:ring-teal-500"
-        >
-          <option value="">— Pilih nama —</option>
-          {team.map((member) => (
-            <option key={member.id} value={member.id}>
-              {member.name}
-            </option>
-          ))}
-        </select>
-      </div>
+        </span>
+        <div className="relative">
+          <select
+            id="user"
+            value={userId}
+            onChange={(event) => setUserId(event.target.value)}
+            className={cx(INPUT, "appearance-none pr-9")}
+          >
+            <option value="">— Pilih nama —</option>
+            {team.map((member) => (
+              <option key={member.id} value={member.id}>
+                {member.name}
+              </option>
+            ))}
+          </select>
+          <svg
+            viewBox="0 0 20 20"
+            aria-hidden="true"
+            className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-slate-400"
+          >
+            <path
+              d="M6 8l4 4 4-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+      </label>
 
-      <div>
-        <label
-          htmlFor="pin"
-          className="mb-1.5 block text-sm font-medium text-slate-700"
-        >
+      <label className="block">
+        <span className="mb-1.5 block text-sm font-medium text-slate-700">
           PIN
-        </label>
+        </span>
         <input
           id="pin"
           type="password"
@@ -110,12 +121,12 @@ export default function LoginForm({ team }: { team: TeamMember[] }) {
           value={pin}
           onChange={(event) => setPin(event.target.value.replace(/\D/g, ""))}
           placeholder="••••"
-          className="w-full rounded-xl border-0 bg-white px-4 py-3 text-center text-2xl tracking-[0.5em] text-slate-900 ring-1 ring-slate-300 outline-none focus:ring-2 focus:ring-teal-500"
+          className={cx(INPUT, "text-center text-xl tracking-[0.4em]")}
         />
-      </div>
+      </label>
 
       {error && (
-        <p className="rounded-xl bg-rose-50 px-4 py-2.5 text-sm text-rose-700 ring-1 ring-rose-200">
+        <p className="rounded-control bg-rose-50 px-3.5 py-2.5 text-sm text-rose-700">
           {error}
         </p>
       )}
@@ -123,7 +134,7 @@ export default function LoginForm({ team }: { team: TeamMember[] }) {
       <button
         type="submit"
         disabled={busy}
-        className="w-full rounded-xl bg-teal-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-teal-700 active:bg-teal-800 disabled:opacity-60"
+        className={cx(BTN_PRIMARY, "w-full py-3 text-[15px]")}
       >
         {busy ? "Memeriksa…" : "Masuk"}
       </button>

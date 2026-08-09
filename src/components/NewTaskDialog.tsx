@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import Sheet from "./Sheet";
 import type { Task } from "@/lib/types";
+import { BTN_PRIMARY, INPUT, cx } from "@/lib/ui";
 
 type Props = {
   today: string;
@@ -16,22 +18,8 @@ export default function NewTaskDialog({ today, onClose, onCreated }: Props) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    function onKey(event: KeyboardEvent) {
-      if (event.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
-    };
-  }, [onClose]);
-
-  async function handleSubmit(event: React.FormEvent) {
-    event.preventDefault();
+  async function submit() {
     setError("");
-
     if (title.trim().length < 2) {
       setError("Nama tugas minimal 2 karakter.");
       return;
@@ -42,7 +30,11 @@ export default function NewTaskDialog({ today, onClose, onCreated }: Props) {
       const res = await fetch("/api/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: title.trim(), target: target.trim(), dueDate }),
+        body: JSON.stringify({
+          title: title.trim(),
+          target: target.trim(),
+          dueDate,
+        }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -59,85 +51,88 @@ export default function NewTaskDialog({ today, onClose, onCreated }: Props) {
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 backdrop-blur-[2px] sm:items-center sm:p-6"
-      onClick={onClose}
-      role="presentation"
+    <Sheet
+      title="Tugas baru"
+      description="Tugas otomatis tercatat atas nama kamu."
+      onClose={onClose}
+      footer={
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={submit}
+            disabled={busy || title.trim().length < 2}
+            className={cx(BTN_PRIMARY, "flex-1")}
+          >
+            {busy ? "Menyimpan…" : "Simpan tugas"}
+          </button>
+        </div>
+      }
     >
       <form
-        onClick={(event) => event.stopPropagation()}
-        onSubmit={handleSubmit}
-        className="max-h-[92dvh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-5 shadow-xl sm:rounded-2xl"
+        onSubmit={(event) => {
+          event.preventDefault();
+          submit();
+        }}
+        className="space-y-4 pb-4"
       >
-        <h2 className="mb-4 text-lg font-bold text-slate-900">Tugas baru</h2>
+        <Field label="Nama tugas">
+          <input
+            autoFocus
+            value={title}
+            maxLength={120}
+            onChange={(event) => setTitle(event.target.value)}
+            placeholder="mis. Follow up quotation PT Sejahtera"
+            className={INPUT}
+          />
+        </Field>
 
-        <div className="space-y-4">
-          <label className="block">
-            <span className="mb-1.5 block text-sm font-medium text-slate-700">
-              Nama tugas
-            </span>
-            <input
-              autoFocus
-              value={title}
-              maxLength={120}
-              onChange={(event) => setTitle(event.target.value)}
-              placeholder="mis. Follow up quotation PT Sejahtera"
-              className={inputClass}
-            />
-          </label>
+        <Field label="Target" hint="opsional">
+          <input
+            value={target}
+            maxLength={200}
+            onChange={(event) => setTarget(event.target.value)}
+            placeholder="mis. 20 pengiriman / Rp 50 juta"
+            className={INPUT}
+          />
+        </Field>
 
-          <label className="block">
-            <span className="mb-1.5 block text-sm font-medium text-slate-700">
-              Target <span className="font-normal text-slate-400">(opsional)</span>
-            </span>
-            <input
-              value={target}
-              maxLength={200}
-              onChange={(event) => setTarget(event.target.value)}
-              placeholder="mis. 20 pengiriman / Rp 50 juta"
-              className={inputClass}
-            />
-          </label>
+        <Field label="Due date">
+          <input
+            type="date"
+            value={dueDate}
+            onChange={(event) => setDueDate(event.target.value)}
+            className={INPUT}
+          />
+        </Field>
 
-          <label className="block">
-            <span className="mb-1.5 block text-sm font-medium text-slate-700">
-              Due date
-            </span>
-            <input
-              type="date"
-              value={dueDate}
-              onChange={(event) => setDueDate(event.target.value)}
-              className={inputClass}
-            />
-          </label>
+        {error && (
+          <p className="rounded-control bg-rose-50 px-3 py-2.5 text-sm text-rose-700">
+            {error}
+          </p>
+        )}
 
-          {error && (
-            <p className="rounded-xl bg-rose-50 px-3 py-2.5 text-sm text-rose-700 ring-1 ring-rose-200">
-              {error}
-            </p>
-          )}
-
-          <div className="flex gap-2 pt-1">
-            <button
-              type="submit"
-              disabled={busy}
-              className="flex-1 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
-            >
-              {busy ? "Menyimpan…" : "Simpan tugas"}
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-xl bg-white px-4 py-3 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
-            >
-              Batal
-            </button>
-          </div>
-        </div>
+        <button type="submit" className="hidden" aria-hidden="true" />
       </form>
-    </div>
+    </Sheet>
   );
 }
 
-const inputClass =
-  "w-full rounded-xl border-0 bg-white px-3.5 py-3 text-base text-slate-900 ring-1 ring-slate-300 outline-none focus:ring-2 focus:ring-blue-500";
+export function Field({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1.5 flex items-baseline gap-1.5">
+        <span className="text-sm font-medium text-slate-700">{label}</span>
+        {hint && <span className="text-xs text-slate-400">{hint}</span>}
+      </span>
+      {children}
+    </label>
+  );
+}

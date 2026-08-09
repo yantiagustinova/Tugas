@@ -10,26 +10,27 @@ export default async function LoginPage() {
   const team = await listTeam();
 
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-slate-100 px-5 py-10">
-      <div className="w-full max-w-sm overflow-hidden rounded-3xl bg-white shadow-[0_10px_40px_-12px_rgba(15,23,42,0.3)] ring-1 ring-slate-900/5">
-        <div className="bg-gradient-to-r from-blue-700 to-blue-600 px-6 py-7 text-center">
-          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 text-2xl font-bold text-white ring-1 ring-white/25">
+    <main className="flex min-h-dvh items-center justify-center px-5 py-10">
+      <div className="w-full max-w-sm">
+        <div className="mb-7 text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-[14px] bg-blue-700 text-lg font-bold text-white shadow-[0_6px_16px_-6px_rgba(29,78,216,0.7)]">
             E
           </div>
-          <h1 className="text-xl font-bold tracking-tight text-white">
+          <h1 className="text-xl font-semibold tracking-tight text-slate-900">
             Task Tracker Envilog
           </h1>
-          <p className="mt-1 text-sm text-blue-100">
+          <p className="mt-1 text-sm text-slate-500">
             Masuk dengan nama dan PIN kamu.
           </p>
         </div>
 
-        <div className="bg-slate-50 p-6">
+        <div className="rounded-2xl bg-white p-5 ring-1 ring-slate-950/5 shadow-[0_1px_3px_rgba(15,23,42,0.06),0_12px_32px_-16px_rgba(15,23,42,0.2)]">
           <LoginForm team={team} />
-          <p className="mt-5 text-center text-xs text-slate-400">
-            Lupa PIN? Hubungi admin tim untuk reset.
-          </p>
         </div>
+
+        <p className="mt-5 text-center text-xs text-slate-400">
+          Lupa PIN? Hubungi admin tim untuk reset.
+        </p>
       </div>
     </main>
   );

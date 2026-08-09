@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { cx } from "@/lib/ui";
+import { BTN_PRIMARY, INPUT, cx } from "@/lib/ui";
 
 type Member = {
   id: number;
@@ -11,8 +11,6 @@ type Member = {
   taskCount: number;
 };
 
-const inputClass =
-  "w-full rounded-xl border-0 bg-white px-3.5 py-3 text-base text-slate-900 ring-1 ring-slate-300 outline-none focus:ring-2 focus:ring-blue-500";
 
 export default function SetupPanel() {
   const [key, setKey] = useState("");
@@ -136,7 +134,7 @@ export default function SetupPanel() {
             value={key}
             onChange={(event) => setKey(event.target.value)}
             placeholder="isi nilai SETUP_SECRET"
-            className={inputClass}
+            className={INPUT}
           />
         </label>
 
@@ -149,7 +147,7 @@ export default function SetupPanel() {
         <button
           type="submit"
           disabled={busy || key.length === 0}
-          className="w-full rounded-xl bg-blue-600 px-4 py-3.5 text-base font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
+          className={cx(BTN_PRIMARY, "w-full py-3")}
         >
           {busy ? "Memeriksa…" : "Buka halaman setup"}
         </button>
@@ -159,7 +157,7 @@ export default function SetupPanel() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl bg-white p-5 ring-1 ring-slate-200">
+      <section className="rounded-card bg-white p-5 ring-1 ring-slate-950/5">
         <h2 className="text-base font-bold text-slate-900">1. Siapkan tabel</h2>
         <p className="mt-1 text-sm text-slate-500">
           Membuat tabel yang belum ada. Aman ditekan berkali-kali — data yang
@@ -169,7 +167,7 @@ export default function SetupPanel() {
           type="button"
           onClick={createSchema}
           disabled={busy}
-          className="mt-3 rounded-xl bg-slate-800 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-900 disabled:opacity-60"
+          className="mt-3 rounded-control bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-50"
         >
           {busy ? "Memproses…" : "Buat / perbarui tabel"}
         </button>
@@ -181,7 +179,7 @@ export default function SetupPanel() {
         )}
       </section>
 
-      <section className="rounded-2xl bg-white p-5 ring-1 ring-slate-200">
+      <section className="rounded-card bg-white p-5 ring-1 ring-slate-950/5">
         <h2 className="text-base font-bold text-slate-900">2. Anggota tim</h2>
         <p className="mt-1 text-sm text-slate-500">
           Nama dan PIN inilah yang dipakai untuk login. Isi nomor WA supaya
@@ -243,7 +241,7 @@ export default function SetupPanel() {
               maxLength={60}
               onChange={(event) => setName(event.target.value)}
               placeholder="mis. Budi"
-              className={inputClass}
+              className={INPUT}
             />
           </label>
 
@@ -256,7 +254,7 @@ export default function SetupPanel() {
               inputMode="tel"
               onChange={(event) => setPhone(event.target.value)}
               placeholder="081234567890"
-              className={inputClass}
+              className={INPUT}
             />
           </label>
 
@@ -273,7 +271,7 @@ export default function SetupPanel() {
               maxLength={8}
               onChange={(event) => setPin(event.target.value.replace(/\D/g, ""))}
               placeholder="1234"
-              className={inputClass}
+              className={INPUT}
             />
           </label>
 
@@ -296,7 +294,7 @@ export default function SetupPanel() {
         </form>
       </section>
 
-      <section className="rounded-2xl bg-amber-50 p-5 ring-1 ring-amber-200">
+      <section className="rounded-card bg-amber-50 p-5 ring-1 ring-amber-200">
         <h2 className="text-base font-bold text-amber-900">3. Tutup pintunya</h2>
         <p className="mt-1 text-sm text-amber-800">
           Kalau semua anggota sudah terdaftar, hapus env{" "}

@@ -12,7 +12,7 @@ type Member = {
 };
 
 const inputClass =
-  "w-full rounded-xl border-0 bg-white px-3.5 py-3 text-base text-slate-900 ring-1 ring-slate-300 outline-none focus:ring-2 focus:ring-teal-500";
+  "w-full rounded-xl border-0 bg-white px-3.5 py-3 text-base text-slate-900 ring-1 ring-slate-300 outline-none focus:ring-2 focus:ring-blue-500";
 
 export default function SetupPanel() {
   const [key, setKey] = useState("");
@@ -149,7 +149,7 @@ export default function SetupPanel() {
         <button
           type="submit"
           disabled={busy || key.length === 0}
-          className="w-full rounded-xl bg-teal-600 px-4 py-3.5 text-base font-semibold text-white transition hover:bg-teal-700 disabled:opacity-60"
+          className="w-full rounded-xl bg-blue-600 px-4 py-3.5 text-base font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
         >
           {busy ? "Memeriksa…" : "Buka halaman setup"}
         </button>
@@ -288,7 +288,7 @@ export default function SetupPanel() {
             type="submit"
             disabled={busy || name.trim().length < 2}
             className={cx(
-              "w-full rounded-xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-teal-700 disabled:opacity-60",
+              "w-full rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60",
             )}
           >
             {busy ? "Menyimpan…" : "Simpan anggota"}

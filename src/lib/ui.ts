@@ -24,9 +24,9 @@ export const STATE_META: Record<
   },
   "on-track": {
     label: "On-track",
-    accent: "bg-teal-500",
-    chip: "bg-teal-50 text-teal-700 ring-teal-200",
-    dot: "bg-teal-500",
+    accent: "bg-sky-500",
+    chip: "bg-sky-50 text-sky-700 ring-sky-200",
+    dot: "bg-sky-500",
   },
 };
 
@@ -40,7 +40,7 @@ export function progressBarColor(state: DerivedState): string {
   if (state === "selesai") return "bg-emerald-500";
   if (state === "terlambat") return "bg-rose-500";
   if (state === "segera") return "bg-amber-500";
-  return "bg-teal-500";
+  return "bg-sky-500";
 }
 
 export function initials(name: string): string {
@@ -53,7 +53,7 @@ export function initials(name: string): string {
 }
 
 const AVATAR_COLORS = [
-  "bg-teal-100 text-teal-700",
+  "bg-blue-100 text-blue-700",
   "bg-sky-100 text-sky-700",
   "bg-violet-100 text-violet-700",
   "bg-amber-100 text-amber-700",

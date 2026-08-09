@@ -217,7 +217,7 @@ export default function TaskDialog({
                 type="button"
                 onClick={save}
                 disabled={busy}
-                className="flex-1 rounded-xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-teal-700 disabled:opacity-60"
+                className="flex-1 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
               >
                 {busy ? "Menyimpan…" : "Simpan"}
               </button>
@@ -247,7 +247,7 @@ export default function TaskDialog({
 }
 
 const inputClass =
-  "w-full rounded-xl border-0 bg-white px-3.5 py-3 text-base text-slate-900 ring-1 ring-slate-300 outline-none focus:ring-2 focus:ring-teal-500";
+  "w-full rounded-xl border-0 bg-white px-3.5 py-3 text-base text-slate-900 ring-1 ring-slate-300 outline-none focus:ring-2 focus:ring-blue-500";
 
 function Field({
   label,

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AppShell, { AppHeader, headerButtonClass } from "@/components/AppShell";
 import { formatDateId } from "@/lib/dates";
 import { runReminders } from "@/lib/reminder";
 import { requireUser } from "@/lib/session";
@@ -17,22 +18,20 @@ export default async function ReminderPreviewPage() {
   const gid = groupId();
 
   return (
-    <div className="min-h-dvh pb-16">
-      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/85 backdrop-blur">
-        <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
-          <Link
-            href="/"
-            className="rounded-xl px-3 py-2 text-sm font-medium text-slate-500 ring-1 ring-slate-200 hover:bg-slate-50"
-          >
-            ← Dashboard
-          </Link>
-          <h1 className="text-base font-bold text-slate-900">
-            Pratinjau pengingat
-          </h1>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-3xl space-y-5 px-4 py-5">
+    <AppShell
+      header={
+        <AppHeader
+          title="Pratinjau pengingat"
+          subtitle="Isi pesan WhatsApp hari ini — tidak dikirim"
+          actions={
+            <Link href="/" className={headerButtonClass}>
+              ← Dashboard
+            </Link>
+          }
+        />
+      }
+    >
+      <div className="space-y-5">
         <div className="rounded-2xl bg-white p-4 text-sm ring-1 ring-slate-200">
           <p className="text-slate-600">
             Isi pesan yang akan dikirim cron harian untuk tanggal{" "}
@@ -88,8 +87,8 @@ export default async function ReminderPreviewPage() {
             </pre>
           </div>
         </section>
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }
 

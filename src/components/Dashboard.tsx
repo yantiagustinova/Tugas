@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import AppShell, { AppHeader, headerButtonClass } from "./AppShell";
 import NewTaskDialog from "./NewTaskDialog";
 import TaskCard from "./TaskCard";
 import TaskDialog from "./TaskDialog";
@@ -120,36 +121,34 @@ export default function Dashboard({
   }
 
   return (
-    <div className="min-h-dvh pb-24">
-      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/85 backdrop-blur">
-        <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-teal-600 text-sm font-bold text-white">
-            E
-          </div>
-          <div className="min-w-0 flex-1">
-            <h1 className="truncate text-base leading-tight font-bold text-slate-900">
-              Task Tracker Envilog
-            </h1>
-            <p className="truncate text-xs text-slate-500">Halo, {user.name}</p>
-          </div>
-          <button
-            type="button"
-            onClick={() => setCreating(true)}
-            className="hidden rounded-xl bg-teal-600 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-teal-700 sm:block"
-          >
-            + Tugas
-          </button>
-          <button
-            type="button"
-            onClick={logout}
-            className="rounded-xl px-3 py-2 text-sm font-medium text-slate-500 ring-1 ring-slate-200 transition hover:bg-slate-50"
-          >
-            Keluar
-          </button>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-3xl px-4 py-4">
+    <AppShell
+      contentClassName="pb-24 sm:pb-6"
+      header={
+        <AppHeader
+          title="Task Tracker Envilog"
+          subtitle={`Halo, ${user.name}`}
+          actions={
+            <div className="flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setCreating(true)}
+                className="hidden rounded-xl bg-white px-3.5 py-2 text-sm font-semibold text-blue-700 shadow-sm transition hover:bg-blue-50 sm:block"
+              >
+                + Tugas
+              </button>
+              <button
+                type="button"
+                onClick={logout}
+                className={headerButtonClass}
+              >
+                Keluar
+              </button>
+            </div>
+          }
+        />
+      }
+    >
+      <div>
         <section className="grid grid-cols-4 gap-2">
           <Stat label="Total" value={stats.total} tone="slate" />
           <Stat label="Terlambat" value={stats.terlambat} tone="rose" />
@@ -158,7 +157,7 @@ export default function Dashboard({
         </section>
 
         <section className="mt-4 space-y-2.5">
-          <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-0.5">
+          <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-0.5 sm:-mx-6 sm:px-6">
             {STATE_FILTERS.map((filter) => (
               <button
                 key={filter.key}
@@ -181,7 +180,7 @@ export default function Dashboard({
               value={owner}
               onChange={(event) => setOwner(event.target.value)}
               aria-label="Filter pemilik"
-              className="rounded-xl border-0 bg-white py-2 pr-8 pl-3 text-sm text-slate-700 ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-teal-500"
+              className="rounded-xl border-0 bg-white py-2 pr-8 pl-3 text-sm text-slate-700 ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="semua">Semua orang</option>
               <option value="saya">Tugas saya</option>
@@ -196,7 +195,7 @@ export default function Dashboard({
               value={sortKey}
               onChange={(event) => setSortKey(event.target.value as SortKey)}
               aria-label="Urutkan"
-              className="rounded-xl border-0 bg-white py-2 pr-8 pl-3 text-sm text-slate-700 ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-teal-500"
+              className="rounded-xl border-0 bg-white py-2 pr-8 pl-3 text-sm text-slate-700 ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="due">Due date terdekat</option>
               <option value="updated">Terakhir diupdate</option>
@@ -288,13 +287,13 @@ export default function Dashboard({
             Lihat pratinjau pesan
           </a>
         </p>
-      </main>
+      </div>
 
       <button
         type="button"
         onClick={() => setCreating(true)}
         aria-label="Tambah tugas"
-        className="fixed right-5 bottom-5 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-teal-600 text-3xl leading-none text-white shadow-lg transition hover:bg-teal-700 active:scale-95 sm:hidden"
+        className="fixed right-5 bottom-5 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-3xl leading-none text-white shadow-lg transition hover:bg-blue-700 active:scale-95 sm:hidden"
       >
         +
       </button>
@@ -316,7 +315,7 @@ export default function Dashboard({
           onDeleted={removeTask}
         />
       )}
-    </div>
+    </AppShell>
   );
 }
 

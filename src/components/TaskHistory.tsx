@@ -82,7 +82,7 @@ export default function TaskHistory({ taskId }: { taskId: number }) {
                   <span
                     className={cx(
                       "mt-1.5 h-2 w-2 shrink-0 rounded-full",
-                      entry.kind === "dibuat" ? "bg-slate-300" : "bg-teal-500",
+                      entry.kind === "dibuat" ? "bg-slate-300" : "bg-blue-500",
                     )}
                   />
                   {!isLast && <span className="mt-1 w-px flex-1 bg-slate-200" />}

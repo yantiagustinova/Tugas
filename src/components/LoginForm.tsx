@@ -82,7 +82,7 @@ export default function LoginForm({ team }: { team: TeamMember[] }) {
           id="user"
           value={userId}
           onChange={(event) => setUserId(event.target.value)}
-          className="w-full rounded-xl border-0 bg-white px-4 py-3 text-base text-slate-900 ring-1 ring-slate-300 outline-none focus:ring-2 focus:ring-teal-500"
+          className="w-full rounded-xl border-0 bg-white px-4 py-3 text-base text-slate-900 ring-1 ring-slate-300 outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">— Pilih nama —</option>
           {team.map((member) => (
@@ -110,7 +110,7 @@ export default function LoginForm({ team }: { team: TeamMember[] }) {
           value={pin}
           onChange={(event) => setPin(event.target.value.replace(/\D/g, ""))}
           placeholder="••••"
-          className="w-full rounded-xl border-0 bg-white px-4 py-3 text-center text-2xl tracking-[0.5em] text-slate-900 ring-1 ring-slate-300 outline-none focus:ring-2 focus:ring-teal-500"
+          className="w-full rounded-xl border-0 bg-white px-4 py-3 text-center text-2xl tracking-[0.5em] text-slate-900 ring-1 ring-slate-300 outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
@@ -123,7 +123,7 @@ export default function LoginForm({ team }: { team: TeamMember[] }) {
       <button
         type="submit"
         disabled={busy}
-        className="w-full rounded-xl bg-teal-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-teal-700 active:bg-teal-800 disabled:opacity-60"
+        className="w-full rounded-xl bg-blue-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-blue-700 active:bg-blue-800 disabled:opacity-60"
       >
         {busy ? "Memeriksa…" : "Masuk"}
       </button>

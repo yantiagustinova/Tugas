@@ -157,7 +157,7 @@ export default function TaskCard({
                     className={cx(
                       "h-9 flex-1 rounded-lg text-xs font-semibold transition",
                       task.progress === step
-                        ? "bg-teal-600 text-white shadow-sm"
+                        ? "bg-blue-600 text-white shadow-sm"
                         : "bg-slate-100 text-slate-600 hover:bg-slate-200",
                     )}
                   >
